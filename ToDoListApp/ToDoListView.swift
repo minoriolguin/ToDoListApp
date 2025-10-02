@@ -53,29 +53,50 @@ struct ToDoListView: View {
 
 struct AddToDoView: View {
     @Environment(\.dismiss) var dissmiss
+    
+//    Placeholders
+    @State private var itemName: String = ""
+    @State private var itemDetails: String = ""
+    @State private var itemDueDate: Date = Date()
+    @State private var itemLocation: String = ""
+//    Replace with to do list item
+
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text("Add New Task")
                 .font(.title)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Form {
+                Section(header: Text("Task Details")) {
+                    TextField("Title", text: $itemName)
+                    TextField("Description", text: $itemDetails)
+                }
+                .padding(4)
                 
+                Section(header: Text("Additional Info")) {
+                    DatePicker("Date", selection: $itemDueDate, displayedComponents: [.date])
+                    TextField("Location", text: $itemLocation)
+                }
+                .padding(4)
+            }
+
             Button(action: {
                 dissmiss()
                 print("Save pressed")
             }) {
                 Text("Save")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
             }
-            
-            Spacer()
+            .modifier(SaveButtonStyle())
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .background(Color("LightGrey"))
     }
 }
 
 #Preview {
-    HomeView()
+    ToDoListView()
 }
