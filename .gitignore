@@ -1,2 +1,5 @@
 .DS_Store
-ToDoListApp.xcodeproj/
+ToDoListApp.xcodeproj/project.xcworkspace/xcuserdata/*
+ToDoListApp.xcodeproj/xcuserdata/*
+ToDoListApp.xcodeproj/UserInterfaceState.xcuserstate
+
