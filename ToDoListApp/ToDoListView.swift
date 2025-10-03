@@ -73,33 +73,38 @@ struct ToDoListView: View {
             if !todomodel.items.isEmpty {
                 List {
                     ForEach(filteredIndices, id: \.self) { i in
+                        let item = todomodel.items[i]
+                        let titlePart = ". Task title: " + item.title
+                        let descPart = item.description.isEmpty ? "" : ". Description: " + item.description
+                        let datePart = ". Deadline: " + item.date.formatted(date: .abbreviated, time: .omitted)
+                        let locationPart = item.location.isEmpty ? "" : ". Location: " + item.location
+                        
                         HStack {
-                            Image(systemName: todomodel.items[i].isCompleted ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(todomodel.items[i].isCompleted ? .green : .gray)
-                                .accessibilityLabel(todomodel.items[i].isCompleted ? "Task completed" : "Task not completed")
-                                .accessibilityHint(todomodel.items[i].isCompleted ? "Tap this button to mark this task as not completed": "Tap this button to mark this task as completed")
+                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(item.isCompleted ? .green : .gray)
+                                .accessibilityHidden(true)
                                 .onTapGesture {
                                     todomodel.items[i].isCompleted.toggle()
                         
                                 }
 
                             VStack(alignment: .leading, spacing: 4) {
-                                if !todomodel.items[i].title.isEmpty {
-                                    Text(todomodel.items[i].title)
+                                if !item.title.isEmpty {
+                                    Text(item.title)
                                         .font(.title2)
                                         .bold()
-                                        .strikethrough(todomodel.items[i].isCompleted)
+                                        .strikethrough(item.isCompleted)
                                 }
-                                if !todomodel.items[i].description.isEmpty {
-                                    Text(todomodel.items[i].description)
+                                if !item.description.isEmpty {
+                                    Text(item.description)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 }
-                                Text(todomodel.items[i].date, style: .date)
+                                Text(item.date, style: .date)
                                     .font(.caption)
                                     .foregroundColor(.gray)
-                                if !todomodel.items[i].location.isEmpty {
-                                    Text(todomodel.items[i].location)
+                                if !item.location.isEmpty {
+                                    Text(item.location)
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
@@ -107,6 +112,11 @@ struct ToDoListView: View {
                             .padding(.horizontal)
                         }
                         .contentShape(Rectangle())
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(Text(titlePart + descPart + datePart + locationPart))
+                        .accessibilityValue(item.isCompleted ? "Completed" : "Not completed")
+                        .accessibilityHint(editMode == .active ? "Tap this button to edit this task" : "Tap this button to toggle completion")
+                        .accessibilityAddTraits(.isButton)
                         .onTapGesture {
                             if editMode == .active {
                                 editingIndex = i
