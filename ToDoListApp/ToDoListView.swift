@@ -12,6 +12,7 @@ struct ToDoListView: View {
     @State private var isExpanded: Bool = false
     @StateObject private var todomodel = ToDoViewModel()
     @State private var editMode: EditMode = .inactive
+    @State private var editingIndex: Int? = nil
         
     private func matches(_ item: ToDoItem) -> Bool {
         let search = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -65,56 +66,61 @@ struct ToDoListView: View {
                 .padding(.horizontal)
                 .accessibilityHint("Enter a search term to filter tasks")
             
+            let filteredIndices = todomodel.items.indices.filter { i in
+                searchText.isEmpty || matches(todomodel.items[i])
+            }
+            
             if !todomodel.items.isEmpty {
                 List {
-                    ForEach($todomodel.items) { $item in
-                        if searchText.isEmpty || matches(item) {
-                            
-                            HStack {
-                                Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(item.isCompleted ? .green : .gray)
+                    ForEach(filteredIndices, id: \.self) { i in
+                        HStack {
+                            Image(systemName: todomodel.items[i].isCompleted ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(todomodel.items[i].isCompleted ? .green : .gray)
+                                .onTapGesture {
+                                    todomodel.items[i].isCompleted.toggle()
                                     .accessibilityLabel(item.isCompleted ? "Task completed" : "Task not completed")
                                     .accessibilityHint(item.isCompleted ? "Tap this button to mark this task as not completed"
                                                                         : "Tap this button to mark this task as completed")
-                                    .onTapGesture {
-                                        item.isCompleted.toggle()
                                 }
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    if !item.title.isEmpty {
-                                        Text(item.title)
-                                            .font(.title2)
-                                            .bold()
-                                            .strikethrough(item.isCompleted)
-                                    }
-                                    
-                                    if !item.description.isEmpty {
-                                        Text(item.description)
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
-                                    }
-                                    
-                                    Text(item.date, style: .date)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                if !todomodel.items[i].title.isEmpty {
+                                    Text(todomodel.items[i].title)
+                                        .font(.title2)
+                                        .bold()
+                                        .strikethrough(todomodel.items[i].isCompleted)
+                                }
+                                if !todomodel.items[i].description.isEmpty {
+                                    Text(todomodel.items[i].description)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                                Text(todomodel.items[i].date, style: .date)
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                if !todomodel.items[i].location.isEmpty {
+                                    Text(todomodel.items[i].location)
                                         .font(.caption)
                                         .foregroundColor(.gray)
-                                    
-                                    if !item.location.isEmpty {
-                                        Text(item.location)
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-
-                                    }
-                                    
                                 }
-                                .padding(.horizontal)
+                            }
+                            .padding(.horizontal)
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if editMode == .active {
+                                editingIndex = i
+                            } else {
+                                todomodel.items[i].isCompleted.toggle()
                             }
                         }
                     }
-                    .onDelete{ offsets in
-                        todomodel.remove(at: offsets) }
+                    .onDelete { offsets in
+                        let real = IndexSet(offsets.map { filteredIndices[$0] })
+                        todomodel.remove(at: real)
+                    }
                 }
-            }
-            else {
+            } else {
                 Spacer()
             }
                             
@@ -132,6 +138,16 @@ struct ToDoListView: View {
                 AddToDoView { newItem in
                     todomodel.add(newItem)
                 }
+            }
+        }
+        .sheet (
+            isPresented: Binding(
+                get: { editingIndex != nil },
+                set: { if !$0 { editingIndex = nil } }
+            )
+        ) {
+            if let i = editingIndex, todomodel.items.indices.contains(i) {
+                EditToDoView(item: $todomodel.items[i])
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
