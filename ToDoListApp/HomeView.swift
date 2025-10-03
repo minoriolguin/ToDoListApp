@@ -52,7 +52,7 @@ struct HomeView: View {
                 }
                 .modifier(ButtonStyle())
                 .accessibilityLabel("Open to-do list")
-                .accessibilityHint("Double tap button to navigate to list of tasks")
+                .accessibilityHint("Tap button to navigate to list of tasks")
         }
         .tint(.black)
         .padding()
