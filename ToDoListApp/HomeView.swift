@@ -17,9 +17,22 @@ struct ButtonStyle: ViewModifier {
         }
 }
 
+struct SaveButtonStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            content
+                .foregroundStyle(.blue)
+                .padding()
+//                .background(Color.white)
+                .cornerRadius(24)
+        }
+}
+
 extension View {
     func brandButtonStyle() -> some View {
         self.modifier(ButtonStyle())
+    }
+    func saveButtonStyle() -> some View {
+        self.modifier(SaveButtonStyle())
     }
 }
 
