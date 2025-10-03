@@ -76,11 +76,11 @@ struct ToDoListView: View {
                         HStack {
                             Image(systemName: todomodel.items[i].isCompleted ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(todomodel.items[i].isCompleted ? .green : .gray)
+                                .accessibilityLabel(todomodel.items[i].isCompleted ? "Task completed" : "Task not completed")
+                                .accessibilityHint(todomodel.items[i].isCompleted ? "Tap this button to mark this task as not completed": "Tap this button to mark this task as completed")
                                 .onTapGesture {
                                     todomodel.items[i].isCompleted.toggle()
-                                    .accessibilityLabel(item.isCompleted ? "Task completed" : "Task not completed")
-                                    .accessibilityHint(item.isCompleted ? "Tap this button to mark this task as not completed"
-                                                                        : "Tap this button to mark this task as completed")
+                        
                                 }
 
                             VStack(alignment: .leading, spacing: 4) {
