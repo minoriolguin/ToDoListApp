@@ -12,6 +12,18 @@ struct ToDoListView: View {
     @State private var isExpanded: Bool = false
     @State private var listItems: [ToDoItem] = []
         
+    private func matches(_ item: ToDoItem) -> Bool {
+        let search = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        func contains(_ s: String?) -> Bool {
+            (s ?? "").lowercased().contains(search)
+        }
+
+        return contains(item.title) ||
+               contains(item.description) ||
+               contains(item.location)
+    }
+    
     var body: some View {
         VStack {
             Button(action: {
@@ -24,23 +36,62 @@ struct ToDoListView: View {
                     .cornerRadius(8)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding()
             
             Text("To-Do List")
                 .font(.title)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
 
             TextField("Search tasks...", text: $searchText)
                 .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
             
             if !listItems.isEmpty {
                 List {
-                    ForEach(listItems) { item in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(item.title)
+                    ForEach($listItems) { $item in
+                        if searchText.isEmpty || matches(item) {
+                            
+                            HStack {
+                                Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(item.isCompleted ? .green : .gray)
+                                    .onTapGesture {
+                                        item.isCompleted.toggle()
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    if !item.title.isEmpty {
+                                        Text(item.title)
+                                            .font(.title2)
+                                            .bold()
+                                            .strikethrough(item.isCompleted)
+                                    }
+                                    
+                                    if !item.description.isEmpty {
+                                        Text(item.description)
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    
+                                    Text(item.date, style: .date)
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                    
+                                    if !item.location.isEmpty {
+                                        Text(item.location)
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+
+                                    }
+                                    
+                                }
+                                .padding(.horizontal)
+                            }
                         }
                     }
                 }
+
             }
             else {
                 Spacer()
@@ -52,6 +103,7 @@ struct ToDoListView: View {
             }) {
                 Text("Add Item")
                     .foregroundStyle(.blue)
+                    .padding()
             }
             .sheet(isPresented: $isExpanded) {
                 AddToDoView { newItem in
@@ -60,64 +112,9 @@ struct ToDoListView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-
     }
 }
 
-struct AddToDoView: View {
-    @Environment(\.dismiss) var dissmiss
-    
-    @State private var inputTitle: String = ""
-    @State private var inputDescription: String = ""
-    @State private var inputDate: Date = Date()
-    @State private var inputLocation: String = ""
-    
-    let onSave: (ToDoItem) -> Void
-
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Add New Task")
-                .font(.title)
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Form {
-                Section(header: Text("Task Details")) {
-                    TextField("Title", text: $inputTitle)
-                    TextField("Description", text: $inputDescription)
-                }
-                .padding(4)
-                
-                Section(header: Text("Additional Info")) {
-                    DatePicker("Date", selection: $inputDate, displayedComponents: [.date])
-                    TextField("Location", text: $inputLocation)
-                }
-                .padding(4)
-            }
-
-            Button(action: {
-                let item = ToDoItem(
-                    title: inputTitle,
-                    description: inputDescription,
-                    date: inputDate,
-                    location: inputLocation
-                )
-                onSave(item)
-                dissmiss()
-                print("Save pressed")
-            }) {
-                Text("Save")
-                    .frame(maxWidth: .infinity)
-            }
-            .modifier(SaveButtonStyle())
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
-        .background(Color("LightGrey"))
-    }
-}
 
 #Preview {
     ToDoListView()

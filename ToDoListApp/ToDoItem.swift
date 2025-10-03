@@ -12,4 +12,5 @@ struct ToDoItem: Identifiable {
     var description: String
     var date: Date
     var location: String
+    var isCompleted: Bool = false
 }
