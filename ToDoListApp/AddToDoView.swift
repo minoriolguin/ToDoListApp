@@ -24,17 +24,22 @@ struct AddToDoView: View {
                 .font(.title)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityHeading(.h1)
+                .accessibilityHint("This is the add new task page")
             
             Form {
                 Section(header: Text("Task Details")) {
                     TextField("Title", text: $inputTitle)
+                        .accessibilityHint("Type the title of the task here")
                     TextField("Description", text: $inputDescription)
+                        .accessibilityHint("Type the description of the task here")
                 }
                 .padding(4)
                 
                 Section(header: Text("Additional Info")) {
                     DatePicker("Date", selection: $inputDate, displayedComponents: [.date])
                     TextField("Location", text: $inputLocation)
+                        .accessibilityHint("Type the location of the task here")
                 }
                 .padding(4)
             }
@@ -51,7 +56,7 @@ struct AddToDoView: View {
                 } else {
                    hasTitle = false
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                         hasTitle = true
                     }
 
@@ -61,6 +66,7 @@ struct AddToDoView: View {
                 VStack{
                     Text("Save")
                         .frame(maxWidth: .infinity)
+                        .accessibilityHint("Tap this button to save the task")
                     
                     if !hasTitle {
                         Text("Title is required to save a task.")

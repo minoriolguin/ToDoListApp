@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+
 struct ButtonStyle: ViewModifier {
         func body(content: Content) -> some View {
             content
@@ -43,12 +44,16 @@ struct HomeView: View {
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .padding()
+                .accessibilityHeading(.h1)
+                .accessibilityLabel("Welcome to the To-Do List App")
                 
                 NavigationLink(destination: ToDoListView()) {
                     Text("Go to To-Do List")
                         .padding(.horizontal, 24)
                 }
                 .modifier(ButtonStyle())
+                .accessibilityLabel("Open to-do list")
+                .accessibilityHint("Double tap button to navigate to list of tasks")
         }
         .tint(.black)
         .padding()
