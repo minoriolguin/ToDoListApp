@@ -22,7 +22,6 @@ struct SaveButtonStyle: ViewModifier {
             content
                 .foregroundStyle(.blue)
                 .padding()
-//                .background(Color.white)
                 .cornerRadius(24)
         }
 }
