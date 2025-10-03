@@ -41,13 +41,12 @@ struct AddToDoView: View {
 
             Button(action: {
                 if !inputTitle.isEmpty {
-                    let item = ToDoItem(
+                    onSave(ToDoItem(
                         title: inputTitle,
                         description: inputDescription,
                         date: inputDate,
                         location: inputLocation
-                    )
-                    onSave(item)
+                    ))
                     dismiss()
                 } else {
                    hasTitle = false

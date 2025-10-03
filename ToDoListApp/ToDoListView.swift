@@ -10,7 +10,7 @@ import SwiftUI
 struct ToDoListView: View {
     @State private var searchText: String = ""
     @State private var isExpanded: Bool = false
-    @State private var listItems: [ToDoItem] = []
+    @StateObject private var todomodel = ToDoViewModel()
         
     private func matches(_ item: ToDoItem) -> Bool {
         let search = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -48,9 +48,9 @@ struct ToDoListView: View {
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
             
-            if !listItems.isEmpty {
+            if !todomodel.items.isEmpty {
                 List {
-                    ForEach($listItems) { $item in
+                    ForEach($todomodel.items) { $item in
                         if searchText.isEmpty || matches(item) {
                             
                             HStack {
@@ -107,7 +107,7 @@ struct ToDoListView: View {
             }
             .sheet(isPresented: $isExpanded) {
                 AddToDoView { newItem in
-                    listItems.append(newItem)
+                    todomodel.add(newItem)
                 }
             }
         }
