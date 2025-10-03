@@ -11,6 +11,7 @@ struct ToDoListView: View {
     @State private var searchText: String = ""
     @State private var isExpanded: Bool = false
     @StateObject private var todomodel = ToDoViewModel()
+    @State private var editMode: EditMode = .inactive
         
     private func matches(_ item: ToDoItem) -> Bool {
         let search = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -28,15 +29,24 @@ struct ToDoListView: View {
         VStack {
             Button(action: {
                 print("Edit button tapped")
+                editMode = (editMode == .active ? .inactive : .active)
             }) {
-                Text("Edit")
-                    .padding(4)
-                    .background(Color.white)
-                    .foregroundColor(.black)
-                    .cornerRadius(8)
+                if editMode == .active {
+                    Image(systemName: "checkmark")
+                        .padding(12)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .font(.system(size: 24))
+                } else {
+                    Text("Edit")
+                        .padding(13)
+                        .background(Color.white)
+                        .foregroundColor(.black)
+                }
             }
+            .clipShape(.circle)
+            .padding(.horizontal)
             .frame(maxWidth: .infinity, alignment: .trailing)
-            .padding()
             
             Text("To-Do List")
                 .font(.title)
@@ -90,8 +100,9 @@ struct ToDoListView: View {
                             }
                         }
                     }
+                    .onDelete{ offsets in
+                        todomodel.remove(at: offsets) }
                 }
-
             }
             else {
                 Spacer()
@@ -112,6 +123,7 @@ struct ToDoListView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .environment(\.editMode, $editMode)
     }
 }
 
